@@ -113,6 +113,9 @@ class PRM(object):
             self.generate_batch(self.BATCH_SIZE)
             nodes_visited = self.a_star(start_node, goal_node)
             current_g = goal_node.g
+            if not nodes_visited.size:
+                print("Haven't reached goal yet.")
+
         for node in nodes_visited:
             print(node.coords)
 
@@ -159,6 +162,7 @@ class PRM(object):
 
     def generate_batch(self, batch_size):
         i = 0
+        print("Generating batch")
         while i < batch_size:
             x = random.randint(self.x_range[0], self.x_range[1])
             y = random.randint(self.y_range[0], self.y_range[1])

@@ -26,6 +26,7 @@ def map_callback(data):
                 world_x = origin_x + (x + 0.5) * resolution
                 world_y = origin_y + (y + 0.5) * resolution
                 OBSTACLE_COORDS.append(Coordinate(world_x, world_y))
+    print("OBSTACLES DONE")
 
 
 def init_listener():
@@ -44,6 +45,8 @@ def main():
     obs_coords = []
     for obs in OBSTACLE_COORDS:
         obs_coords.append(init_from_center(obs, resolution=0.05))
+
+    print("Created obstacle coordinates.")
     # Establish coordinates
     x_range = (0, 100)
     y_range = (0, 100)
@@ -52,6 +55,7 @@ def main():
     prm_instnace = PRM(x_range, y_range, obs_coords)
 
     # Run algorithm
+    print("Generating map")
     prm_instnace.generate_map(Coordinate(0,0), goal_point)
 
 if __name__ == "__main__":
