@@ -98,7 +98,7 @@ class PRM(object):
             obstacles.append(Obstacle(obs[0], obs[1]))
         return obstacles
 
-    def generate_map(self, start_point):
+    def generate_map(self, start_point, goal):
         start_node = Node(start_point)
         goal_node = Node(goal)
         start_node.g = 0

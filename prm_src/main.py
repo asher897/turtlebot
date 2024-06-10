@@ -32,7 +32,7 @@ def map_callback(data):
 def init_listener():
     rospy.init_node('map_listener')
     rospy.Subscriber('/map', OccupancyGrid, map_callback)
-    rospy.spin()
+    # rospy.spin()
 
 
 def main():
@@ -40,9 +40,11 @@ def main():
 
     init_listener()
     goal = input()
-    goal_point = Coordinate(int(goal.split(",")[0]), int(goal.split(",")[1]))
+    coords = goal.split(",")
+    goal_point = Coordinate(int(coords[0]), int(coords(",")[1]))
 
     obs_coords = []
+    print("adding ob")
     for obs in OBSTACLE_COORDS:
         obs_coords.append(init_from_center(obs, resolution=0.05))
 
