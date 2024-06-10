@@ -1,10 +1,5 @@
-import copy
-from typing import List, Tuple
 import numpy as np
 import random
-
-import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
 
 
 class Coordinate(object):
@@ -118,8 +113,6 @@ class PRM(object):
             self.generate_batch(self.BATCH_SIZE)
             nodes_visited = self.a_star(start_node, goal_node)
             current_g = goal_node.g
-
-        # self.plot_path(nodes_visited)
         for node in nodes_visited:
             print(node.coords)
 
@@ -262,25 +255,3 @@ class PRM(object):
     def is_in_obstacle(x, y, obstacle):
         return (obstacle.top_left.x <= x <= obstacle.bottom_right.x) and (
                     obstacle.top_left.y >= y >= obstacle.bottom_right.y)
-
-    def plot_path(self, nodes_visited):
-        plt.clf()
-        for obstacle in self.obstacles:
-            polygon = plt.Polygon(obstacle.plot_points, closed=True, color='red', alpha=1)
-            plt.gca().add_patch(polygon)
-
-        x_points = list(map(lambda x: x.x, nodes_visited))
-        all_x_points = list(map(lambda x: x.x, self.nodes))
-        all_y_points = list(map(lambda x: x.y, self.nodes))
-        y_points = list(map(lambda x: x.y, nodes_visited))
-
-        plt.plot(x_points, y_points, '-o')
-        plt.scatter(all_x_points, all_y_points, color='g')
-
-        plt.xlim(0, 100)
-        plt.ylim(0, 100)
-        # plt.grid(True)
-        plt.xlabel('X-axis')
-        plt.ylabel('Y-axis')
-        plt.title('2D Domain with Obstacles')
-        plt.savefig("./path_taken.png")
