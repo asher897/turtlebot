@@ -16,11 +16,11 @@ class Coordinate(object):
         return self.x == other.x and self.y == other.y
 
     def __str__(self):
-        return f"{self.x},{self.y}"
+        return "{x},{y}".format(x=self.x, y=self.y)
 
 
 class Obstacle(object):
-    def __init__(self, top_left: Coordinate, bottom_right: Coordinate):
+    def __init__(self, top_left, bottom_right):
         self.top_left = top_left
         self.bottom_right = bottom_right
         self.bottom_left = Coordinate(top_left.x, bottom_right.y)
@@ -31,7 +31,7 @@ class Obstacle(object):
         ]
 
 
-def init_from_center(center_coordinate: Coordinate, resolution: float = 0.05):
+def init_from_center(center_coordinate, resolution = 0.05):
     top_left = Coordinate(center_coordinate.x-resolution//2, center_coordinate.y+resolution//2)
     bottom_right = Coordinate(center_coordinate.x+resolution//2, center_coordinate.y-resolution//2)
 
@@ -48,7 +48,7 @@ class Edge(object):
 
 
 class Node(object):
-    def __init__(self, coords: Coordinate):
+    def __init__(self, coords):
         self.coords: Coordinate = coords
         self.x: int = coords.x
         self.y: int = coords.y
@@ -65,7 +65,7 @@ class Node(object):
         weight = next(filter(lambda x: x if (x.neighbour.coords == possible_parent.coords) else 0, self.edges)).weight
         return possible_parent.g + weight
 
-    def set_h(self, goal: Coordinate):
+    def set_h(self, goal):
         if not self.h:
             self.h = np.linalg.norm(
                 np.array([self.x, self.y]) - np.array([goal.x, goal.y])
@@ -89,7 +89,7 @@ class Node(object):
 
 
 class PRM(object):
-    def __init__(self, x_range: Tuple, y_range: Tuple, obs_coords: List[Tuple[Coordinate, Coordinate]]):
+    def __init__(self, x_range, y_range, obs_coords):
         self.x_range: Tuple = x_range
         self.y_range: Tuple = y_range
         self.nodes = np.array([])
@@ -97,13 +97,13 @@ class PRM(object):
         self.obstacles = self.get_obstacles(obs_coords)
 
     @staticmethod
-    def get_obstacles(obs_coords: List[Tuple[Coordinate, Coordinate]]):
+    def get_obstacles(obs_coords):
         obstacles = []
         for obs in obs_coords:
             obstacles.append(Obstacle(obs[0], obs[1]))
         return obstacles
 
-    def generate_map(self, start_point: Coordinate, goal: Coordinate):
+    def generate_map(self, start_point):
         start_node = Node(start_point)
         goal_node = Node(goal)
         start_node.g = 0
@@ -123,7 +123,7 @@ class PRM(object):
         for node in nodes_visited:
             print(node.coords)
 
-    def a_star(self, start: Node, goal: Node):
+    def a_star(self, start, goal):
         '''
         Performs the A* algorithm to reach the goal from the start coordinates using milestones as
         intermediary nodes
@@ -152,7 +152,7 @@ class PRM(object):
 
         return self.get_path(start, goal)
 
-    def get_path(self, start: Node, goal: Node):
+    def get_path(self, start, goal):
         optimal_path = [goal]
         current_node = goal
         while current_node != start:
@@ -185,7 +185,7 @@ class PRM(object):
                 i += 1
 
     ''' Updated find_node_neighbours method to use collision_free '''
-    def find_node_neighbours(self, new_node: Node):
+    def find_node_neighbours(self, new_node):
         for node in self.nodes:
             if self.collision_free(node.coords, new_node.coords):  # Use collision_free method for consistency
                 node.add_edge(Edge(node, new_node))
@@ -229,14 +229,14 @@ class PRM(object):
             return x_bounds and y_bounds
 
     ''' Added collision_free method to use intersects for robust collision checking '''
-    def collision_free(self, node: Coordinate, new_node: Coordinate) -> bool:
+    def collision_free(self, node, new_node):
         for obstacle in self.obstacles:
             if self.intersects(node, new_node, obstacle):
                 return False
         return True
 
     ''' Added intersects method to check if path intersects with obstacle corners '''
-    def intersects(self, node: Coordinate, new_node: Coordinate, obstacle: Obstacle) -> bool:
+    def intersects(self, node, new_node, obstacle):
         def ccw(A, B, C):
             return (C.y - A.y) * (B.x - A.x) > (B.y - A.y) * (C.x - A.x)
 
