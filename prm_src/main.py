@@ -40,8 +40,8 @@ def main():
 
     init_listener()
     goal = input()
-    coords = goal.split(",")
-    goal_point = Coordinate(int(coords[0]), int(coords(",")[1]))
+    # coords = goal.split(",")
+    goal_point = Coordinate(int(goal[0]), int(goal[1]))
 
     obs_coords = []
     print("adding ob")

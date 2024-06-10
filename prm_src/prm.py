@@ -57,7 +57,7 @@ class Node(object):
         self.parent = parent
 
     def get_possible_g(self, possible_parent):
-        weight = next(filter(lambda x: x if (x.neighbour.coords == possible_parent.coords) else 0, self.edges)).weight
+        weight = [i for i in self.edges if (i.neighbour.coords == possible_parent.coords)][0].weight
         return possible_parent.g + weight
 
     def set_h(self, goal):
@@ -89,7 +89,7 @@ class PRM(object):
         self.y_range = y_range
         self.nodes = np.array([])
         self.BATCH_SIZE = 10
-        self.obstacles = self.get_obstacles(obs_coords)
+        self.obstacles = obs_coords
 
     @staticmethod
     def get_obstacles(obs_coords):
