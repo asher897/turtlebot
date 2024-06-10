@@ -1,0 +1,6 @@
+<launch>
+  <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" output="screen">
+    <param name="minimumScore" value="100000" />
+  </node>
+  <node pkg="your_prm_package" type="prm_node.py" name="prm_planner" output="screen"/>
+</launch>
