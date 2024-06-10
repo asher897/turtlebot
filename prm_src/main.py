@@ -39,8 +39,7 @@ def main():
 
     init_listener()
     goal = input()
-    coords = goal.split(";")
-    goal_point = Coordinate(int(coords[1].split(",")[0]), int(coords[1].split(",")[1]))
+    goal_point = Coordinate(int(goal.split(",")[0]), int(goal.split(",")[1]))
 
     obs_coords = []
     for obs in OBSTACLE_COORDS:
