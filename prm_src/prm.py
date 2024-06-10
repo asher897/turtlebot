@@ -40,8 +40,8 @@ def init_from_center(center_coordinate, resolution = 0.05):
 
 class Edge(object):
     def __init__(self, current_node, neighbour):
-        self.current_node: Node = current_node
-        self.neighbour: Node = neighbour
+        self.current_node = current_node
+        self.neighbour = neighbour
         self.weight = np.linalg.norm(
             np.array([current_node.x, current_node.y]) - np.array([neighbour.x, neighbour.y])
         )
@@ -49,13 +49,13 @@ class Edge(object):
 
 class Node(object):
     def __init__(self, coords):
-        self.coords: Coordinate = coords
-        self.x: int = coords.x
-        self.y: int = coords.y
+        self.coords = coords
+        self.x = coords.x
+        self.y = coords.y
         self.edges = np.array([])
-        self.g: float = 999999
-        self.h: float = 0
-        self.parent: Node = None
+        self.g = 999999
+        self.h = 0
+        self.parent = None
         self.searched = False
 
     def set_parent(self, parent):
@@ -90,8 +90,8 @@ class Node(object):
 
 class PRM(object):
     def __init__(self, x_range, y_range, obs_coords):
-        self.x_range: Tuple = x_range
-        self.y_range: Tuple = y_range
+        self.x_range = x_range
+        self.y_range = y_range
         self.nodes = np.array([])
         self.BATCH_SIZE = 10
         self.obstacles = self.get_obstacles(obs_coords)
@@ -132,7 +132,7 @@ class PRM(object):
         :return: A list of milestones visited on the way to the goal, empty list if the goal is not rechable
         '''
         nodes_visited = np.array([])
-        current_node: Node = start
+        current_node = start
         while current_node and current_node != goal:
             for edge in current_node.edges:
                 node_to_search = edge.neighbour
