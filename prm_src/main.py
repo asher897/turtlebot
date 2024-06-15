@@ -37,7 +37,7 @@ def init_listener():
 
 
 def init_pid():
-    rospy.init_node('pid_controller', anonymous=True)
+    # rospy.init_node('pid_controller', anonymous=True)
     pid_controller = PIDController()
     pid_controller.start_up()
     return pid_controller
@@ -74,7 +74,10 @@ def main():
     print("Starting PID...")
 
     for coord in path:
+        print("Coords: ",coord )
+        pid_controller.rotate_bot(coord)
         pid_controller.get_to_coordinate(coord)
+
 
 
 if __name__ == "__main__":
