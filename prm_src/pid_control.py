@@ -2,7 +2,7 @@
 
 import rospy
 from std_msgs.msg import String, Empty
-from geometry_msg.msg import Twist, Vector3
+from geometry_msgs.msg import Twist, Vector3
 from gazebo_msgs.srv import GetModelState
 import math
 import sympy as sym
@@ -24,6 +24,9 @@ class PIDController:
 
     def get_to_coordinate(self, coordinate_in_world_rf):
         acc_errors = []
+        bot_state = self.model_state("mobile_base", "")
+        orientation = bot_state.pose.orientation
+        self.calculate_transformation_matrix(orientation.w)
         coordinate = self.get_coordinate_in_bot_reference_frame(coordinate_in_world_rf)
         current_pos = self.get_current_position()
         error = self.get_error(coordinate, current_pos)
@@ -50,6 +53,7 @@ class PIDController:
             self.rotation(1)
 
         while abs(rotate_by) > 0:
+            print(rotate_by)
             rotate_by = self.get_rotation(current_pos, goal_pos)
 
         self.rotation(0)
@@ -57,11 +61,14 @@ class PIDController:
     def get_current_orientation(self):
         bot_state = self.model_state("mobile_base", "")
         orientation = bot_state.pose.orientation
-        return orientation.yaw
+        print("Orientation = ",orientation)
+        return orientation.w
 
     def get_rotation(self, current_pos, goal_pos):
         current_theta = self.get_current_orientation()
+        print("current theta = ", current_theta)
         desired_theta = math.atan2(goal_pos.y-current_pos.y, goal_pos.x-current_pos.x)
+        print("desired theta = ", desired_theta)
 
         rotate_by_radians = desired_theta-current_theta
         rotate_by = math.degrees(rotate_by_radians)
@@ -73,14 +80,14 @@ class PIDController:
 
         T0_1 = sym.Matrix(
             [
-                [cos(theta), -sin(theta), 0, current_pos[0]],
-                [sin(theta), cos(theta), 0, current_pos[1]],
+                [cos(theta), -sin(theta), 0, current_pos.x],
+                [sin(theta), cos(theta), 0, current_pos.y],
                 [0, 0, 1, 0],
                 [0, 0, 0, 1]
             ]
         )
 
-        self.T0_1 = T0_1.replace(theta, rotate_by)
+        self.T0_1 = T0_1.subs(theta, rotate_by)
 
     def get_coordinate_in_bot_reference_frame(self, coordinate):
         p1 = sym.Matrix(
@@ -101,8 +108,8 @@ class PIDController:
 
     def calculate_pid(self, acc_errors):
         previous_error = acc_errors[-2] if len(acc_errors) > 2 else [0,0]
-        vx = self.kp*acc_errors[-1][0] + self.ki*sum([i][0] for i in acc_errors) + self.kd*(acc_errors[-1][0] - previous_error[0])
-        # vy = self.kp * acc_errors[-1][1] + self.ki * sum([i][1] for i in acc_errors) + self.kd * (acc_errors[-1][1] - previous_error[1])
+        vx = self.kp*acc_errors[-1][0] + self.ki*sum(i[0] for i in acc_errors) + self.kd*(acc_errors[-1][0] - previous_error[0])
+        #vy = self.kp * acc_errors[-1][1] + self.ki * sum([i][1] for i in acc_errors) + self.kd * (acc_errors[-1][1] - previous_error[1])
 
         return Vector3(vx, 0, 0)
 

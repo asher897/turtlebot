@@ -32,11 +32,11 @@ class Obstacle(object):
         ]
 
 
-def init_from_center(center_coordinate, resolution=0.05):
+def init_from_center(center_coordinate, resolution=0.05, turtlebot_radius=5):
     top_left = Coordinate(center_coordinate.x-resolution/2, center_coordinate.y+resolution/2)
     bottom_right = Coordinate(center_coordinate.x+resolution/2, center_coordinate.y-resolution/2)
 
-    return Obstacle(top_left, bottom_right)
+    return Obstacle(top_left, bottom_right, turtlebot_radius)
 
 
 class Edge(object):
@@ -121,6 +121,9 @@ class PRM(object):
             current_g = goal_node.g
             if not nodes_visited.size:
                 print("Haven't reached goal yet.")
+
+        for node in nodes_visited:
+            print(node.coords)
 
         return nodes_visited
 

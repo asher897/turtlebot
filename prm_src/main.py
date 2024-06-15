@@ -43,11 +43,6 @@ def init_pid():
     return pid_controller
 
 
-def get_turtlebot_position():
-
-
-
-
 def main():
     global OBSTACLE_COORDS
 
@@ -61,6 +56,8 @@ def main():
     for obs in OBSTACLE_COORDS:
         obs_coords.append(init_from_center(obs, resolution=0.05))
 
+    print("OBSTACLES DONE")
+
     # Establish coordinates
     x_range = (0, 100)
     y_range = (0, 100)
@@ -69,7 +66,12 @@ def main():
     prm_instance = PRM(x_range, y_range, obs_coords)
 
     # Run algorithm
+
+    print("Starting PRM algorithm...")
+
     path = prm_instance.generate_map(Coordinate(0, 0), goal_point)
+    
+    print("Starting PID...")
 
     for coord in path:
         pid_controller.get_to_coordinate(coord)
