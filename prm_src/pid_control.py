@@ -12,8 +12,10 @@ from prm import Coordinate
 class PIDController:
     def __init__(self):
         self.model_state = rospy.ServiceProxy("/gazebo/get_model_state", GetModelState)
-        self.move_forward_pub = rospy.Publisher("/cmd_vel", Twist, queue_size=10)
-        self.rotation_pub = rospy.Publisher("/cmd_vel", Twist, queue_size=10)
+        # self.move_forward_pub = rospy.Publisher("/mobile_base/commands/velocity", Twist, queue_size=10)
+        self.move_forward_pub = rospy.Publisher("/cmd_vel_mux/input/navi", Twist, queue_size=10)
+        # self.rotation_pub = rospy.Publisher("/mobile_base/commands/velocity", Twist, queue_size=10)
+        self.rotation_pub = rospy.Publisher("/cmd_vel_mux/input/navi", Twist, queue_size=10)
         self.kp = 1.15
         self.ki = 0.3
         self.kd = 0.3
@@ -53,7 +55,7 @@ class PIDController:
         self.rotation(0)
 
     def get_current_orientation(self):
-        bot_state = self.model_state("turtlebot", "")
+        bot_state = self.model_state("mobile_base", "")
         orientation = bot_state.pose.orientation
         return orientation.yaw
 
@@ -100,9 +102,9 @@ class PIDController:
     def calculate_pid(self, acc_errors):
         previous_error = acc_errors[-2] if len(acc_errors) > 2 else [0,0]
         vx = self.kp*acc_errors[-1][0] + self.ki*sum([i][0] for i in acc_errors) + self.kd*(acc_errors[-1][0] - previous_error[0])
-        vy = self.kp * acc_errors[-1][1] + self.ki * sum([i][1] for i in acc_errors) + self.kd * (acc_errors[-1][1] - previous_error[1])
+        # vy = self.kp * acc_errors[-1][1] + self.ki * sum([i][1] for i in acc_errors) + self.kd * (acc_errors[-1][1] - previous_error[1])
 
-        return Vector3(vx, vy, 0)
+        return Vector3(vx, 0, 0)
 
     # Publishers
     def movement(self, linear_movement):
