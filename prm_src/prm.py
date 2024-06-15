@@ -15,7 +15,13 @@ class Coordinate(object):
 
 
 class Obstacle(object):
-    def __init__(self, top_left, bottom_right):
+    def __init__(self, top_left, bottom_right, turtlebot_radius=0):
+        # Account for turtlebots size
+        top_left.x += turtlebot_radius*1.2
+        top_left.y += turtlebot_radius*1.2
+        bottom_right.x += turtlebot_radius*1.2
+        bottom_right.y += turtlebot_radius*1.2
+
         self.top_left = top_left
         self.bottom_right = bottom_right
         self.bottom_left = Coordinate(top_left.x, bottom_right.y)
@@ -26,9 +32,9 @@ class Obstacle(object):
         ]
 
 
-def init_from_center(center_coordinate, resolution = 0.05):
-    top_left = Coordinate(center_coordinate.x-resolution//2, center_coordinate.y+resolution//2)
-    bottom_right = Coordinate(center_coordinate.x+resolution//2, center_coordinate.y-resolution//2)
+def init_from_center(center_coordinate, resolution=0.05):
+    top_left = Coordinate(center_coordinate.x-resolution/2, center_coordinate.y+resolution/2)
+    bottom_right = Coordinate(center_coordinate.x+resolution/2, center_coordinate.y-resolution/2)
 
     return Obstacle(top_left, bottom_right)
 
@@ -116,8 +122,7 @@ class PRM(object):
             if not nodes_visited.size:
                 print("Haven't reached goal yet.")
 
-        for node in nodes_visited:
-            print(node.coords)
+        return nodes_visited
 
     def a_star(self, start, goal):
         '''

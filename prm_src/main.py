@@ -5,6 +5,7 @@ from std_msgs.msg import String, Empty
 from geometry_msgs.msg import Twist, Vector3
 
 from prm import PRM, Coordinate, init_from_center
+from pid_control import PIDController
 
 
 global OBSTACLE_COORDS
@@ -30,35 +31,49 @@ def map_callback(data):
 
 
 def init_listener():
-    rospy.init_node('map_listener')
+    rospy.init_node('map_listener', anonymous=True)
     rospy.Subscriber('/map', OccupancyGrid, map_callback)
     # rospy.spin()
+
+
+def init_pid():
+    rospy.init_node('pid_controller', anonymous=True)
+    pid_controller = PIDController()
+    pid_controller.start_up()
+    return pid_controller
+
+
+def get_turtlebot_position():
+
+
 
 
 def main():
     global OBSTACLE_COORDS
 
     init_listener()
+    pid_controller = init_pid()
     goal = input()
     # coords = goal.split(",")
     goal_point = Coordinate(int(goal[0]), int(goal[1]))
 
     obs_coords = []
-    print("adding ob")
     for obs in OBSTACLE_COORDS:
         obs_coords.append(init_from_center(obs, resolution=0.05))
 
-    print("Created obstacle coordinates.")
     # Establish coordinates
     x_range = (0, 100)
     y_range = (0, 100)
 
     # Create prm instance
-    prm_instnace = PRM(x_range, y_range, obs_coords)
+    prm_instance = PRM(x_range, y_range, obs_coords)
 
     # Run algorithm
-    print("Generating map")
-    prm_instnace.generate_map(Coordinate(0,0), goal_point)
+    path = prm_instance.generate_map(Coordinate(0, 0), goal_point)
+
+    for coord in path:
+        pid_controller.get_to_coordinate(coord)
+
 
 if __name__ == "__main__":
     main()
