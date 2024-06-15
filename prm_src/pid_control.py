@@ -19,6 +19,9 @@ class PIDController:
         self.kp = 1.15
         self.ki = 0.3
         self.kd = 0.3
+        self.rotate_kp = 1.15
+        self.rotate_ki = 0.3
+        self.rotate_kd = 0.3
         self.rate = rospy.Rate(10)
         self.T0_1 = sym.Matrix()
 
@@ -46,15 +49,13 @@ class PIDController:
 
     # Rotation
     def rotate_bot(self, current_pos, goal_pos):
-        rotate_by = self.get_rotation(current_pos, goal_pos)
-        if rotate_by == 0:
-            return
-        else:
-            self.rotation(1)
+        acc_errors = []
+        error = self.get_rotation(current_pos, goal_pos)
 
-        while abs(rotate_by) > 0:
-            print(rotate_by)
-            rotate_by = self.get_rotation(current_pos, goal_pos)
+        while abs(error) > 0.5:
+            acc_errors.append(error)
+            pid = self.calculate_rotation_pid(acc_errors)
+            self.rotation(pid)
 
         self.rotation(0)
 
@@ -113,6 +114,13 @@ class PIDController:
 
         return Vector3(vx, 0, 0)
 
+    def calculate_rotation_pid(self, acc_errors):
+        previous_error = acc_errors[-2] if len(acc_errors) > 2 else 0
+        vz = self.rotate_kp*acc_errors[-1] + self.rotate_ki*sum(i for i in acc_errors) + self.rotate_kd*(acc_errors[-1] - previous_error[0])
+        #vy = self.kp * acc_errors[-1][1] + self.ki * sum([i][1] for i in acc_errors) + self.kd * (acc_errors[-1][1] - previous_error[1])
+
+        return Vector3(0, 0, vz)
+
     # Publishers
     def movement(self, linear_movement):
         rospy.loginfo("Moving forward")
@@ -120,10 +128,10 @@ class PIDController:
         angular = Vector3(0, 0, 0)
         self.move_forward_pub.publish(linear, angular)
 
-    def rotation(self, z):
+    def rotation(self, angular_velocity):
         rospy.loginfo("Rotating")
         linear = Vector3(0, 0, 0)
-        angular = Vector3(0, 0, z)
+        angular = angular_velocity
         self.rotation_pub.publish(linear, angular)
 
     # Confirm subscribers
