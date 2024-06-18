@@ -22,6 +22,7 @@ class PIDController:
         self.rotate_ki = 0
         self.rotate_kd = 0
         self.rate = rospy.Rate(1)
+        self.movement_rate = rospy.Rate(10)
         self.T0_1 = sym.Matrix()
 
     def get_to_coordinate(self, coordinate_in_world_rf):
@@ -39,7 +40,7 @@ class PIDController:
             acc_errors.append(error)
             pid = self.calculate_pid(acc_errors)
             self.movement(pid)
-            self.rate.sleep()
+            self.movement_rate.sleep()
 
             current_pos = self.get_current_position()
             error = self.get_error(coordinate, current_pos)
@@ -51,7 +52,7 @@ class PIDController:
         acc_errors = []
         error = self.get_rotation(current_pos, goal_pos)
 
-        while abs(error) > 0.1:
+        while abs(error) > 0.05:
             print("error = ", error)
             acc_errors.append(error)
             pid = self.calculate_rotation_pid(acc_errors)
