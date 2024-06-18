@@ -15,10 +15,10 @@ class PIDController:
         self.model_state = rospy.ServiceProxy("/gazebo/get_model_state", GetModelState)
         self.move_forward_pub = rospy.Publisher("/cmd_vel_mux/input/navi", Twist, queue_size=10)
         self.rotation_pub = rospy.Publisher("/cmd_vel_mux/input/navi", Twist, queue_size=10)
-        self.kp = 0.01
+        self.kp = 0.1
         self.ki = 0
         self.kd = 0
-        self.rotate_kp = 0.08
+        self.rotate_kp = 0.5
         self.rotate_ki = 0
         self.rotate_kd = 0
         self.rate = rospy.Rate(1)
@@ -36,7 +36,7 @@ class PIDController:
         distance = self.distance_to_coordinate(coordinate_in_world_rf, current_pos)
 
         while distance > 0.05:
-            print( "distance = ", distance)
+            # print( "distance = ", distance)
             acc_errors.append(error)
             pid = self.calculate_pid(acc_errors)
             self.movement(pid)
@@ -49,19 +49,22 @@ class PIDController:
 
     def rotate_bot(self, goal_pos):
         current_pos = self.get_current_position()
+        origin_pos = current_pos
+
         acc_errors = []
-        error = self.get_rotation(current_pos, goal_pos)
+        error = self.get_rotation(origin_pos, goal_pos)
 
         while abs(error) > 0.05:
-            print("error = ", error)
+            # print("error = ", error)
             acc_errors.append(error)
             pid = self.calculate_rotation_pid(acc_errors)
-            print(pid)
+            # print(pid)
             self.rotation(pid)
             self.rate.sleep()
             current_pos = self.get_current_position()
-            error = self.get_rotation(current_pos, goal_pos)
-        print("ending rotation...")
+            # print("Current Pose: ", current_pos)
+            error = self.get_rotation(origin_pos, goal_pos)
+        # print("ending rotation...")
         self.rotation(Vector3(0, 0, 0))
 
     def get_current_orientation(self):
@@ -77,9 +80,9 @@ class PIDController:
 
     def get_rotation(self, current_pos, goal_pos):
         current_theta = self.get_current_orientation()
-        print("Current theta = ", current_theta)
+        # print("Current theta = ", current_theta)
         desired_theta = math.atan2(goal_pos.y - current_pos.y, goal_pos.x - current_pos.x)
-        print("desired Theta = ", desired_theta)
+        # print("desired Theta = ", desired_theta)
         rotate_by_radians = desired_theta - current_theta
         return rotate_by_radians
 
@@ -117,7 +120,7 @@ class PIDController:
     def calculate_pid(self, acc_errors):
         previous_error = acc_errors[-2] if len(acc_errors) > 2 else [0, 0]
         vx = self.kp * acc_errors[-1][0] + self.ki * sum(i[0] for i in acc_errors) + self.kd * (acc_errors[-1][0] - previous_error[0])
-        return Vector3(vx, 0, 0)
+        return Vector3(-vx, 0, 0)
 
     def calculate_rotation_pid(self, acc_errors):
         previous_error = acc_errors[-2] if len(acc_errors) > 2 else 0
@@ -125,7 +128,7 @@ class PIDController:
         return Vector3(0, 0, vz)
 
     def movement(self, linear_movement):
-        rospy.loginfo("Moving forward")
+        # rospy.loginfo("Moving forward")
         linear = linear_movement
         angular = Vector3(0, 0, 0)
         self.move_forward_pub.publish(linear, angular)

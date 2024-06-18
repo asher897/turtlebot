@@ -55,13 +55,13 @@ def main():
 
     obs_coords = []
     for obs in OBSTACLE_COORDS:
-        obs_coords.append(init_from_center(obs, resolution=0.05))
+        obs_coords.append(init_from_center(obs, resolution=0.05, turtlebot_radius=0.2))
 
     print("OBSTACLES DONE")
 
     # Establish coordinates
-    x_range = (0, 100)
-    y_range = (0, 100)
+    x_range = (-13, 13)
+    y_range = (-13, 13)
 
     # Create prm instance
     prm_instance = PRM(x_range, y_range, obs_coords)
@@ -74,7 +74,7 @@ def main():
     
     print("Starting PID...")
 
-    for coord in path:
+    for coord in path[1:]:
         print("Coords: ",coord )
         pid_controller.rotate_bot(coord)
         pid_controller.get_to_coordinate(coord)

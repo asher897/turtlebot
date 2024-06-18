@@ -17,10 +17,10 @@ class Coordinate(object):
 class Obstacle(object):
     def __init__(self, top_left, bottom_right, turtlebot_radius=0):
         # Account for turtlebots size
-        top_left.x += turtlebot_radius*1.2
+        top_left.x -= turtlebot_radius*1.2
         top_left.y += turtlebot_radius*1.2
         bottom_right.x += turtlebot_radius*1.2
-        bottom_right.y += turtlebot_radius*1.2
+        bottom_right.y -= turtlebot_radius*1.2
 
         self.top_left = top_left
         self.bottom_right = bottom_right
@@ -110,6 +110,12 @@ class PRM(object):
         start_node.g = 0
         self.nodes = np.append(self.nodes, np.array([start_node, goal_node]))
 
+        if self.collision_free(start_node.coords, goal_node.coords):  # Use collision_free method for consistency
+            start_node.add_edge(Edge(start_node, goal_node))
+            goal_node.add_edge(Edge(goal_node, start_node))
+            
+            return self.nodes
+
         nodes_visited = np.array([])
         goal_threshold = 0.001
         last_g = goal_node.g
@@ -172,8 +178,8 @@ class PRM(object):
         i = 0
         print("Generating batch")
         while i < batch_size:
-            x = random.randint(self.x_range[0], self.x_range[1])
-            y = random.randint(self.y_range[0], self.y_range[1])
+            x = round(random.uniform(self.x_range[0], self.x_range[1]),4)
+            y = round(random.uniform(self.y_range[0], self.y_range[1]),4)
             node = Node(Coordinate(x, y))
             if np.any(self.nodes == node):
                 continue
