@@ -30,10 +30,10 @@ class PIDController:
         bot_state = self.model_state("mobile_base", "")
         orientation = bot_state.pose.orientation
         self.calculate_transformation_matrix(orientation.w)
-        coordinate = self.get_coordinate_in_bot_reference_frame(coordinate_in_world_rf)
+        # coordinate = self.get_coordinate_in_bot_reference_frame(coordinate_in_world_rf)
         current_pos = self.get_current_position()
-        error = self.get_error(coordinate, current_pos)
-        distance = self.distance_to_coordinate(coordinate, current_pos)
+        error = self.get_error(coordinate_in_world_rf, current_pos)
+        distance = self.distance_to_coordinate(coordinate_in_world_rf, current_pos)
 
         while distance > 0.05:
             print( "distance = ", distance)
@@ -43,8 +43,8 @@ class PIDController:
             self.movement_rate.sleep()
 
             current_pos = self.get_current_position()
-            error = self.get_error(coordinate, current_pos)
-            distance = self.distance_to_coordinate(coordinate, current_pos)
+            error = self.get_error(coordinate_in_world_rf, current_pos)
+            distance = self.distance_to_coordinate(coordinate_in_world_rf, current_pos)
         self.movement(Vector3(0, 0, 0))
 
     def rotate_bot(self, goal_pos):
