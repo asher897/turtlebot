@@ -51,6 +51,7 @@ def main():
     goal = input()
     # coords = goal.split(",")
     goal_point = Coordinate(int(goal[0]), int(goal[1]))
+    start_point = pid_controller.get_current_position()
 
     obs_coords = []
     for obs in OBSTACLE_COORDS:
@@ -69,7 +70,7 @@ def main():
 
     print("Starting PRM algorithm...")
 
-    path = prm_instance.generate_map(Coordinate(0, 0), goal_point)
+    path = prm_instance.generate_map(Coordinate(start_point.x, start_point.y), goal_point)
     
     print("Starting PID...")
 
