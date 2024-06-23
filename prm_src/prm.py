@@ -1,5 +1,6 @@
 import numpy as np
 import random
+import matplotlib.pyplot as plt
 
 
 class Coordinate(object):
@@ -275,3 +276,25 @@ class PRM(object):
     def is_in_obstacle(x, y, obstacle):
         return (obstacle.top_left.x <= x <= obstacle.bottom_right.x) and (
                     obstacle.top_left.y >= y >= obstacle.bottom_right.y)
+
+    def plot_path(self, nodes_visited):
+        plt.clf()
+        for obstacle in self.obstacles:
+            polygon = plt.Polygon(obstacle.plot_points, closed=True, color='red', alpha=1)
+            plt.gca().add_patch(polygon)
+
+        x_points = list(map(lambda x: x.x, nodes_visited))
+        all_x_points = list(map(lambda x: x.x, self.nodes))
+        all_y_points = list(map(lambda x: x.y, self.nodes))
+        y_points = list(map(lambda x: x.y, nodes_visited))
+
+        plt.plot(x_points, y_points, '-o')
+        plt.scatter(all_x_points, all_y_points, color='g')
+
+        plt.xlim(self.x_range[0], self.x_range[1])
+        plt.ylim(self.y_range[0], self.y_range[1])
+        # plt.grid(True)
+        plt.xlabel('X-axis')
+        plt.ylabel('Y-axis')
+        plt.title('2D Domain with Obstacles')
+        plt.savefig("./path_taken.png")
