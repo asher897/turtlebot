@@ -74,10 +74,10 @@ def main():
     
     print("Starting PID...")
 
-    for coord in path[1:]:
-        print("Coords: ",coord )
-        pid_controller.rotate_bot(coord)
-        pid_controller.get_to_coordinate(coord)
+    for coord in path:
+        print("Coords: ",str(coord.coords) )
+        # pid_controller.rotate_bot(coord)
+        # pid_controller.get_to_coordinate(coord)
 
 
 

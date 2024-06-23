@@ -27,6 +27,8 @@ class Obstacle(object):
         self.bottom_left = Coordinate(top_left.x, bottom_right.y)
         self.top_right = Coordinate(bottom_right.x, top_left.y)
 
+        print("TL {TL}, TR {TR}, BR {BR}, BL {BL}: ".format( TL=str(self.top_left), TR=str(self.top_right), BR=str(self.bottom_right), BL=str(self.bottom_left)))
+
         self.plot_points = [
             (self.bottom_left.x, self.bottom_left.y), (self.top_left.x, self.top_left.y), (self.top_right.x, self.top_right.y), (self.bottom_right.x, self.bottom_right.y)
         ]
