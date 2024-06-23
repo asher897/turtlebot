@@ -96,7 +96,7 @@ class PRM(object):
         self.x_range = x_range
         self.y_range = y_range
         self.nodes = np.array([])
-        self.BATCH_SIZE = 10
+        self.BATCH_SIZE = 30
         self.obstacles = obs_coords
 
     @staticmethod
