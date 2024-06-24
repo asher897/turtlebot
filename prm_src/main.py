@@ -30,7 +30,7 @@ def map_callback(data):
                 world_y = origin_y + (y + 0.5) * resolution
                 OBSTACLE_COORDS.append(Coordinate(world_x, world_y))
     # print("OBSTACLES DONE")
-    map_sub.unregister()
+    # map_sub.unregister()
 
 
 def init_listener():
@@ -58,7 +58,7 @@ def main():
     # print(len(obs_coords))
 
     for obs in OBSTACLE_COORDS:
-        obs_coords.append(init_from_center(obs, resolution=0.05, turtlebot_radius=0.2, padding=1.3))
+        obs_coords.append(init_from_center(obs, resolution=0.05, turtlebot_radius=0.2, padding=1.4))
 
     # print("OBSTACLES DONE")
 

@@ -118,9 +118,9 @@ class PRM(object):
 
                 return np.array([])
 
+        self.plot_path(self.nodes)
 
         if self.collision_free(start_node.coords, goal_node.coords):  # Use collision_free method for consistency
-
 
             start_node.add_edge(Edge(start_node, goal_node))
             goal_node.add_edge(Edge(goal_node, start_node))

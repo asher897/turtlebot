@@ -5,8 +5,6 @@ from std_msgs.msg import String, Empty
 from geometry_msgs.msg import Twist, Vector3
 from gazebo_msgs.srv import GetModelState
 import math
-import sympy as sym
-from sympy import cos, sin, pi
 from prm import Coordinate
 import tf.transformations
 
@@ -26,7 +24,6 @@ class PIDController:
         self.rotate_kd_m = 0.000
         self.rate = rospy.Rate(20)
         self.movement_rate = rospy.Rate(10)
-        self.T0_1 = sym.Matrix()
 
     def get_to_coordinate(self, coordinate_in_world_rf):
 
@@ -129,31 +126,6 @@ class PIDController:
         rotate_by_radians = (desired_theta) - (current_theta)
         return rotate_by_radians
 
-    def calculate_transformation_matrix(self, rotate_by):
-        theta = sym.symbols("theta")
-        current_pos = self.get_current_position()
-
-        T0_1 = sym.Matrix(
-            [
-                [cos(theta), -sin(theta), 0, current_pos.x],
-                [sin(theta), cos(theta), 0, current_pos.y],
-                [0, 0, 1, 0],
-                [0, 0, 0, 1]
-            ]
-        )
-
-        self.T0_1 = T0_1.subs(theta, rotate_by)
-
-    def get_coordinate_in_bot_reference_frame(self, coordinate):
-        p1 = sym.Matrix(
-            [
-                [coordinate.x, coordinate.y, 0, 1]
-            ]
-        ).transpose()
-
-        p0 = self.T0_1 * p1
-        coordinate = Coordinate(p0[0], p0[1])
-        return coordinate
 
     def get_current_position(self):
         bot_state = self.model_state("mobile_base", "")
