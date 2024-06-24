@@ -113,6 +113,9 @@ class PRM(object):
 
         for obs in self.obstacles:
             if self.is_in_obstacle(goal.x, goal.y,obs):
+                
+                print("The destination you have chosen is invalid please choose another.")
+
                 return np.array([])
 
 
@@ -185,7 +188,7 @@ class PRM(object):
 
     def generate_batch(self, batch_size):
         i = 0
-        print("Generating batch")
+        # print("Generating batch")
         while i < batch_size:
             x = round(random.uniform(self.x_range[0], self.x_range[1]),4)
             y = round(random.uniform(self.y_range[0], self.y_range[1]),4)

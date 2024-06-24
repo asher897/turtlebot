@@ -55,12 +55,12 @@ def main():
 
     obs_coords = []
 
-    print(len(obs_coords))
+    # print(len(obs_coords))
 
     for obs in OBSTACLE_COORDS:
         obs_coords.append(init_from_center(obs, resolution=0.05, turtlebot_radius=0.2, padding=1.3))
 
-    print("OBSTACLES DONE")
+    # print("OBSTACLES DONE")
 
     # Establish coordinates
     x_range = (-10, 6)
@@ -71,7 +71,7 @@ def main():
 
     # Run algorithm
 
-    print("Starting PRM algorithm...")
+    # print("Starting PRM algorithm...")
 
     done = 0
 
@@ -95,6 +95,8 @@ def main():
 
             path = prm_instance.generate_map(Coordinate(start_point.x, start_point.y), goal_point)
 
+            # print(path.size)
+
         # path = np.array([
         #     Coordinate(0.000789549996006,0.000484783623094),
         #     Coordinate(-4.0658,1.241),
@@ -108,23 +110,32 @@ def main():
         # path = np.array([
         #     Coordinate(0.000741787065231,0.000499240364303),
         #     Coordinate(-0.1178,-2.017),
-        #     Coordinate(4.249,-0.9126),
+        #     Coordinate(4.549,-0.9126),
         #     Coordinate(4.193,5.1757),
         #     Coordinate(3.9249,6.0433),
         #     Coordinate(-2.0,8.5),
 
         # ])
+
+        # path = np.array([
+        #     Coordinate(0,0),
+        #     Coordinate(-1,0),
+        #     Coordinate(-2,0),
+        #     Coordinate(0,1),
+        #     Coordinate(0,0),
+        #     Coordinate(-1,-1)
+        # ])
         
         print("Starting PID...")
 
         for coord in path[1:]:
-            print("Coords: ",str(coord) )
+            # print("Coords: ",str(coord) )
             pid_controller.rotate_bot(coord)
             pid_controller.get_to_coordinate(coord)
 
-        is_done = raw_input("Are you finished Master? [y/n]")
+        move = raw_input("I've arrived Master. Do you want me to move somewhere else? [y/n]")
 
-        if is_done == 'y':
+        if move == 'n':
             done = True
             break
 
