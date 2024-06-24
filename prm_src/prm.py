@@ -16,30 +16,28 @@ class Coordinate(object):
 
 
 class Obstacle(object):
-    def __init__(self, top_left, bottom_right, turtlebot_radius=0):
+    def __init__(self, top_left, bottom_right, turtlebot_radius=0, padding=1.2):
         # Account for turtlebots size
-        top_left.x -= turtlebot_radius*1.2
-        top_left.y += turtlebot_radius*1.2
-        bottom_right.x += turtlebot_radius*1.2
-        bottom_right.y -= turtlebot_radius*1.2
+        top_left.x -= turtlebot_radius*padding
+        top_left.y += turtlebot_radius*padding
+        bottom_right.x += turtlebot_radius*padding
+        bottom_right.y -= turtlebot_radius*padding
 
         self.top_left = top_left
         self.bottom_right = bottom_right
         self.bottom_left = Coordinate(top_left.x, bottom_right.y)
         self.top_right = Coordinate(bottom_right.x, top_left.y)
 
-        print("TL {TL}, TR {TR}, BR {BR}, BL {BL}: ".format( TL=str(self.top_left), TR=str(self.top_right), BR=str(self.bottom_right), BL=str(self.bottom_left)))
-
         self.plot_points = [
             (self.bottom_left.x, self.bottom_left.y), (self.top_left.x, self.top_left.y), (self.top_right.x, self.top_right.y), (self.bottom_right.x, self.bottom_right.y)
         ]
 
 
-def init_from_center(center_coordinate, resolution=0.05, turtlebot_radius=5):
-    top_left = Coordinate(center_coordinate.x-resolution/2, center_coordinate.y+resolution/2)
-    bottom_right = Coordinate(center_coordinate.x+resolution/2, center_coordinate.y-resolution/2)
+def init_from_center(center_coordinate, resolution=0.05, turtlebot_radius=5, padding=1.2):
+    top_left = Coordinate(center_coordinate.x, center_coordinate.y)
+    bottom_right = Coordinate(center_coordinate.x, center_coordinate.y)
 
-    return Obstacle(top_left, bottom_right, turtlebot_radius)
+    return Obstacle(top_left, bottom_right, turtlebot_radius, padding)
 
 
 class Edge(object):
@@ -97,7 +95,7 @@ class PRM(object):
         self.x_range = x_range
         self.y_range = y_range
         self.nodes = np.array([])
-        self.BATCH_SIZE = 30
+        self.BATCH_SIZE = 15
         self.obstacles = obs_coords
 
     @staticmethod
@@ -113,26 +111,34 @@ class PRM(object):
         start_node.g = 0
         self.nodes = np.append(self.nodes, np.array([start_node, goal_node]))
 
+        for obs in self.obstacles:
+            if self.is_in_obstacle(goal.x, goal.y,obs):
+                return np.array([])
+
+
         if self.collision_free(start_node.coords, goal_node.coords):  # Use collision_free method for consistency
+
+
             start_node.add_edge(Edge(start_node, goal_node))
             goal_node.add_edge(Edge(goal_node, start_node))
+
+            self.plot_path(self.nodes)
             
             return self.nodes
 
-        nodes_visited = np.array([])
-        goal_threshold = 0.001
-        last_g = goal_node.g
-        current_g = 0
-        while not nodes_visited.size or abs(current_g - last_g) > goal_threshold:
-            last_g = current_g
+        nodes_visited = self.a_star(start_node, goal_node)
+
+        while not nodes_visited.size:
             self.generate_batch(self.BATCH_SIZE)
+            # print(goal_node)
             nodes_visited = self.a_star(start_node, goal_node)
-            current_g = goal_node.g
-            if not nodes_visited.size:
-                print("Haven't reached goal yet.")
+            # if not nodes_visited.size:
+                # print("Haven't reached goal yet.")
 
         for node in nodes_visited:
             print(node.coords)
+
+        self.plot_path(nodes_visited)
 
         return nodes_visited
 
@@ -290,6 +296,7 @@ class PRM(object):
 
         plt.plot(x_points, y_points, '-o')
         plt.scatter(all_x_points, all_y_points, color='g')
+
 
         plt.xlim(self.x_range[0], self.x_range[1])
         plt.ylim(self.y_range[0], self.y_range[1])
